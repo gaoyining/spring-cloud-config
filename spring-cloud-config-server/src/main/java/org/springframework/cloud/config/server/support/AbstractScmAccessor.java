@@ -41,6 +41,8 @@ import org.springframework.util.StringUtils;
 /**
  * Base class for components that want to access a source control management system.
  *
+ * 要访问源控制管理系统的组件的基类。
+ *
  * @author Dave Syer
  *
  */
@@ -49,31 +51,45 @@ public abstract class AbstractScmAccessor implements ResourceLoaderAware {
 	protected Log logger = LogFactory.getLog(getClass());
 	/**
 	 * Base directory for local working copy of repository.
+	 *
+	 * 存储库的本地工作副本的基本目录。
 	 */
 	private File basedir;
 	/**
 	 * URI of remote repository.
+	 *
+	 * 远程存储库的URI。
 	 */
 	private String uri;
 	private ConfigurableEnvironment environment;
 	/**
 	 * Username for authentication with remote repository.
+	 *
+	 * 用于远程存储库验证的用户名。
 	 */
 	private String username;
 	/**
 	 * Password for authentication with remote repository.
+	 *
+	 * 远程存储库验证密码。
 	 */
 	private String password;
 	/**
 	 * Passphrase for unlocking your ssh private key.
+	 *
+	 * 用于解锁ssh私钥的密码。
 	 */
 	private String passphrase;
 	/**
 	 * Reject incoming SSH host keys from remote servers not in the known host list.
+	 *
+	 * 从不在已知主机列表中的远程服务器拒绝传入的SSH主机密钥。
 	 */
 	private boolean strictHostKeyChecking;
 	/**
 	 * Search paths to use within local working copy. By default searches only the root.
+	 *
+	 * 搜索在本地工作副本中使用的路径。 默认情况下，仅搜索根。
 	 */
 	private String[] searchPaths;
 
@@ -87,6 +103,8 @@ public abstract class AbstractScmAccessor implements ResourceLoaderAware {
 	public AbstractScmAccessor(ConfigurableEnvironment environment,
 			AbstractScmAccessorProperties properties) {
 		this.environment = environment;
+		// ------------------关键方法----------------
+		// 创建临时文件夹
 		this.basedir = properties.getBasedir() == null ? createBaseDir()
 				: properties.getBasedir();
 		this.passphrase = properties.getPassphrase();
@@ -102,9 +120,15 @@ public abstract class AbstractScmAccessor implements ResourceLoaderAware {
 		this.resourceLoader = resourceLoader;
 	}
 
+	/**
+	 * 创建基础的文件目录
+	 * @return
+	 */
 	protected File createBaseDir() {
 		try {
+			// 创建临时的文件夹
 			final Path basedir = Files.createTempDirectory("config-repo-");
+			// 设置程序运行结束时执行
 			Runtime.getRuntime().addShutdownHook(new Thread() {
 				@Override
 				public void run() {

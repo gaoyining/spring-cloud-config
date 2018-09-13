@@ -42,6 +42,11 @@ public class ConfigServerHealthIndicator extends AbstractHealthIndicator {
 		}
 	}
 
+    /**
+     * 在此方法中实现启动逻辑
+     * @param builder
+     * @throws Exception
+     */
 	@Override
 	protected void doHealthCheck(Health.Builder builder) throws Exception {
 		builder.up();
@@ -52,6 +57,8 @@ public class ConfigServerHealthIndicator extends AbstractHealthIndicator {
 			String profiles = repository.getProfiles();
 
 			try {
+				// ---------------------关键方法-----------------
+				// 从资源库获得资源
 				Environment environment = this.environmentRepository.findOne(application, profiles, repository.getLabel());
 
 				HashMap<String, Object> detail = new HashMap<>();

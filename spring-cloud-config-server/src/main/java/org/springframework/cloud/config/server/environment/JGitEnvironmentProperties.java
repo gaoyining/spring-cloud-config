@@ -31,31 +31,39 @@ public class JGitEnvironmentProperties extends AbstractScmAccessorProperties
         implements HttpEnvironmentRepositoryProperties {
     private static final String DEFAULT_LABEL = "master";
 
-    /** Flag to indicate that the repository should be cloned on startup (not on demand). Generally leads to slower startup but faster first query. */
+    /** Flag to indicate that the repository should be cloned on startup (not on demand). Generally leads to slower startup but faster first query.
+     * 用于指示应在启动时克隆存储库的标志（不是按需）。 通常会导致启动速度变慢但首次查询速度更快*/
     private boolean cloneOnStart = false;
 
-    /** Flag to indicate that the repository should force pull. If true discard any local changes and take from remote repository. */
+    /** Flag to indicate that the repository should force pull. If true discard any local changes and take from remote repository.
+     * 用于指示存储库应强制拉出的标记。 如果为true，则丢弃任何本地更改并从远程存储库获取。*/
     private boolean forcePull;
 
-    /** Timeout (in seconds) for obtaining HTTP or SSH connection (if applicable), defaults to 5 seconds. */
+    /** Timeout (in seconds) for obtaining HTTP or SSH connection (if applicable), defaults to 5 seconds.
+     * 获取HTTP或SSH连接的超时（以秒为单位）（如果适用），默认为5秒。*/
     private int timeout = 5;
 
-    /** Flag to indicate that the branch should be deleted locally if it's origin tracked branch was removed. */
+    /** Flag to indicate that the branch should be deleted locally if it's origin tracked branch was removed.
+     * 标记表示如果删除了原始跟踪分支，则应在本地删除分支。*/
     private boolean deleteUntrackedBranches = false;
 
 	/**
 	 * Flag to indicate that SSL certificate validation should be bypassed when
 	 * communicating with a repository served over an HTTPS connection.
+     *
+     * 用于指示在与通过HTTPS连接提供的存储库进行通信时应绕过SSL证书验证的标记。
 	 */
 	private boolean skipSslValidation = false;
 
     /**
      * Time (in seconds) between refresh of the git repository
+     * 刷新git存储库之间的时间（以秒为单位）
      */
     private int refreshRate = 0;
 
     /**
      * Valid SSH private key. Must be set if ignoreLocalSshSettings is true and Git URI is SSH format.
+     * 有效的SSH私钥。 如果ignoreLocalSshSettings为true且Git URI为SSH格式，则必须设置。
      */
     private String privateKey;
 

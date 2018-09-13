@@ -26,11 +26,15 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 public class ConfigClientHealthProperties {
 	/**
 	 * Flag to indicate that the config server health indicator should be installed.
+	 *
+	 * 用于指示应安装配置服务器运行状况指示器的标志。
 	 */
 	boolean enabled;
 
 	/**
 	 * Time to live for cached result, in milliseconds. Default 300000 (5 min).
+	 *
+	 * 缓存结果的生存时间，以毫秒为单位。 默认300000（5分钟）。
 	 */
 	private long timeToLive = 60 * 5 * 1000;
 

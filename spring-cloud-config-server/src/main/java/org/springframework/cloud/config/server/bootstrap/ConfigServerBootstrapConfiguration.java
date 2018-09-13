@@ -36,6 +36,12 @@ import org.springframework.util.StringUtils;
  * for example, if the config server were embedded in another app that wanted to
  * be configured from the same repository as all the other clients.
  *
+ * Bootstrap配置从（可能是远程的）{@link EnvironmentRepository}获取外部配置。
+ * 默认情况下关闭，因为它可以延迟启动，但可以使用
+ * <code> spring.cloud.config.server.bootstrap = true </ code>启用。
+ * 例如，如果配置服务器嵌入在另一个想要从与所有其他客户端相同的存储库配置的应用程序中，
+ * 这将非常有用。
+ *
  * @author Dave Syer
  * @author Roy Clarkson
  */

@@ -41,6 +41,12 @@ import org.springframework.util.StringUtils;
  * additionally can have its own search paths (subdirectories inside the top level of the
  * repository).
  *
+ * 基于一个或多个git存储库的{@link EnvironmentRepository}。
+ * 对于“默认”属性，可以像单个{@link JGitEnvironmentRepository}一样进行配置，
+ * 然后可以按名称注册其他存储库。 最简单的注册形式只是从名称到uri的地图（如果需要，还有凭证），
+ * 其中每个应用程序都有自己的git存储库。 除了名称，您还可以提供与应用程序名称（甚至模式列表）匹配的模式。
+ * 每个子存储库还可以有自己的搜索路径（存储库顶层内的子目录）。
+ *
  * @author Andy Chan (iceycake)
  * @author Dave Syer
  * @author Gareth Clay
@@ -50,6 +56,8 @@ public class MultipleJGitEnvironmentRepository extends JGitEnvironmentRepository
 
 	/**
 	 * Map of repository identifier to location and other properties.
+     *
+     * 存储库标识符到位置和其他属性的映射。
 	 */
 	private Map<String, PatternMatchingJGitEnvironmentRepository> repos;
 
@@ -74,6 +82,8 @@ public class MultipleJGitEnvironmentRepository extends JGitEnvironmentRepository
 				repo.setName(name);
 			}
 			if (repo.getPattern() == null || repo.getPattern().length == 0) {
+				// ------------------关键方法------------------
+				// 设置partten："0/*" , "0" , "0,*"
 				repo.setPattern(new String[] { name });
 			}
 			if (repo.getTransportConfigCallback() == null) {
@@ -144,9 +154,13 @@ public class MultipleJGitEnvironmentRepository extends JGitEnvironmentRepository
 				}
 			}
 		}
+		// ------------------关键方法---------------
+		// 获得资源库
 		JGitEnvironmentRepository candidate = getRepository(this, application, profile,
 				label);
 		if (candidate == this) {
+			// ------------------关键方法---------------
+			// 获得git，会在这里面做git初始化，checkout，merge，等等
 			return super.getLocations(application, profile, label);
 		}
 		return candidate.getLocations(application, profile, label);
@@ -155,6 +169,8 @@ public class MultipleJGitEnvironmentRepository extends JGitEnvironmentRepository
 	@Override
 	public Environment findOne(String application, String profile, String label) {
 		for (PatternMatchingJGitEnvironmentRepository repository : this.repos.values()) {
+		    // -------------------关键方法----------------------
+            // 查看是否匹配
 			if (repository.matches(application, profile, label)) {
 				for (JGitEnvironmentRepository candidate : getRepositories(repository,
 						application, profile, label)) {
@@ -181,12 +197,15 @@ public class MultipleJGitEnvironmentRepository extends JGitEnvironmentRepository
 				}
 			}
 		}
+		// ---------------关键方法----------------
+		// 获得资源库
 		JGitEnvironmentRepository candidate = getRepository(this, application, profile,
 				label);
 		if (label == null) {
 			label = candidate.getDefaultLabel();
 		}
 		if (candidate == this) {
+			// ---------------关键方法----------------
 			return super.findOne(application, profile, label);
 		}
 		return candidate.findOne(application, profile, label);
@@ -207,25 +226,37 @@ public class MultipleJGitEnvironmentRepository extends JGitEnvironmentRepository
 	private JGitEnvironmentRepository getRepository(JGitEnvironmentRepository repository,
 			String application, String profile, String label) {
 		if (!repository.getUri().contains("{")) {
+			// 如果uri中没有{，则直接返回
 			return repository;
 		}
+
+		// 如果uri中有{
 		String key = repository.getUri();
 
 		// cover the case where label is in the uri, but no label was sent with the
 		// request
+        // 覆盖标签在uri中的情况，但没有发送标签
+        // 请求
 		if (key.contains("{label}") && label == null) {
+		    // 如果uri中包含{label} && label == null ，label设置为默认的
 			label = repository.getDefaultLabel();
 		}
 		if (application != null) {
+			// application 不为空，直接替换
 			key = key.replace("{application}", application);
 		}
 		if (profile != null) {
+			// profile 不为空，直接替换
 			key = key.replace("{profile}", profile);
 		}
 		if (label != null) {
+			// label 不为空，直接替换
 			key = key.replace("{label}", label);
 		}
+
+		// placeholders 不存在，则存入map
 		if (!this.placeholders.containsKey(key)) {
+			// ----------------关键方法--------------
 			this.placeholders.put(key, getRepository(repository, key));
 		}
 		return this.placeholders.get(key);
@@ -243,15 +274,22 @@ public class MultipleJGitEnvironmentRepository extends JGitEnvironmentRepository
 		return repository;
 	}
 
+    /**
+     * 模式匹配JGit环境存储库
+     */
 	public static class PatternMatchingJGitEnvironmentRepository
 			extends JGitEnvironmentRepository {
 
 		/**
 		 * Pattern to match on application name and profiles.
+         *
+         * 应用程序名称和配置文件匹配的模式。
 		 */
 		private String[] pattern = new String[0];
 		/**
 		 * Name of repository (same as map key by default).
+         *
+         * 存储库的名称（默认情况下与映射键相同）。
 		 */
 		private String name;
 
@@ -267,6 +305,13 @@ public class MultipleJGitEnvironmentRepository extends JGitEnvironmentRepository
 			this.name = properties.getName();
 		}
 
+        /**
+         * 查看是否匹配
+         * @param application
+         * @param profile
+         * @param label
+         * @return
+         */
 		public boolean matches(String application, String profile, String label) {
 			if (this.pattern == null || this.pattern.length == 0) {
 				return false;
@@ -316,10 +361,12 @@ public class MultipleJGitEnvironmentRepository extends JGitEnvironmentRepository
 				if (p != null) {
 					if (!p.contains("/")) {
 						// Match any profile
+						// 匹配任何profile
 						patterns.add(p + "/*");
 					}
 					if (!p.endsWith("*")) {
 						// If user supplies only one profile, allow others
+						// 如果用户只提供一个配置文件，请允许其他人
 						otherProfiles.add(p + ",*");
 					}
 				}
@@ -328,6 +375,7 @@ public class MultipleJGitEnvironmentRepository extends JGitEnvironmentRepository
 			patterns.addAll(otherProfiles);
 			if (!patterns.contains(null)) {
 				// Make sure they are unique
+				// 确保它们是独一无二的
 				patterns = new LinkedHashSet<>(patterns);
 			}
 			this.pattern = patterns.toArray(new String[0]);

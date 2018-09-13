@@ -47,6 +47,9 @@ import org.springframework.util.StringUtils;
  * is composed of property sources located using the application name as the config file
  * stem (spring.config.name) and the environment name as a Spring profile.
  *
+ * {@link EnvironmentRepository}的简单实现，它使用通过普通协议定位的SpringApplication和配置文件。
+ * 生成的环境由使用应用程序名称作为配置文件stem（spring.config.name）定位的属性源和作为Spring配置文件的环境名称组成。
+ *
  * @author Dave Syer
  * @author Roy Clarkson
  * @author Venil Noronha
@@ -62,21 +65,30 @@ public class NativeEnvironmentRepository
 	/**
 	 * Locations to search for configuration files. Defaults to the same as a Spring Boot
 	 * app so [classpath:/,classpath:/config/,file:./,file:./config/].
+	 *
+	 * 搜索配置文件的位置。 默认为与Spring Boot应用程序相同，
+	 * 因此[classpath：/，classpath：/ config /，file：./，file：./ config /]。
 	 */
 	private String[] searchLocations;
 
 	/**
 	 * Flag to determine how to handle exceptions during decryption (default false).
+	 *
+	 * 用于确定解密期间如何处理异常的标志（默认为false）。
 	 */
 	private boolean failOnError;
 
 	/**
 	 * Flag to determine whether label locations should be added.
+	 *
+	 * 标记以确定是否应添加标签位置。
 	 */
 	private boolean addLabelLocations;
 
 	/**
 	 * Version string to be reported for native repository
+	 *
+	 * 要为本机存储库报告的版本字符串
 	 */
 	private String version;
 
@@ -130,16 +142,22 @@ public class NativeEnvironmentRepository
 		builder.web(WebApplicationType.NONE).bannerMode(Mode.OFF);
 		if (!logger.isDebugEnabled()) {
 			// Make the mini-application startup less verbose
+			// 使迷你应用程序启动更简洁
 			builder.logStartupInfo(false);
 		}
 		String[] args = getArgs(config, profile, label);
 		// Explicitly set the listeners (to exclude logging listener which would change
 		// log levels in the caller)
+		// 显式设置侦听器（以排除将更改的日志记录侦听器
+		// 调用者中的日志级别）
 		builder.application()
 				.setListeners(Arrays.asList(new ConfigFileApplicationListener()));
 		ConfigurableApplicationContext context = builder.run(args);
 		environment.getPropertySources().remove("profiles");
 		try {
+			// ---------------关键方法--------------
+			// findOne(): 如果当前环境变量中的在standardSources 中不存在，同事满足为MapPropertySource类型，加入返回结果
+			// clean(): findOne()获得结果，如果在environment 中存在，对数据进行处理
 			return clean(new PassthruEnvironmentRepository(environment).findOne(config,
 					profile, label));
 		}
@@ -255,6 +273,7 @@ public class NativeEnvironmentRepository
 				}
 				if (!matches) {
 					// Don't include this one: it wasn't matched by our search locations
+					// 不要包含这个：它与我们的搜索位置不匹配
 					if (logger.isDebugEnabled()) {
 						logger.debug("Not adding property source: " + name);
 					}

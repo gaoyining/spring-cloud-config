@@ -32,6 +32,8 @@ public class ConfigServerHealthIndicator extends AbstractHealthIndicator {
 
     @Override
     protected void doHealthCheck(Builder builder) throws Exception {
+		// ------------------关键方法----------------
+		// 从config server 获得 资源
 		PropertySource<?> propertySource = getPropertySource();
 		builder.up();
 		if (propertySource instanceof CompositePropertySource) {
@@ -50,7 +52,10 @@ public class ConfigServerHealthIndicator extends AbstractHealthIndicator {
 	private PropertySource<?> getPropertySource() {
 		long accessTime = System.currentTimeMillis();
 		if (isCacheStale(accessTime)) {
+			// 第一次启动的时候为 true
 			this.lastAccess = accessTime;
+			// -----------------关键方法-----------------
+			// 执行第一次的fetch，获取相关配置
 			this.cached = locator.locate(this.environment);
 		}
 		return this.cached;
@@ -58,6 +63,7 @@ public class ConfigServerHealthIndicator extends AbstractHealthIndicator {
 
 	private boolean isCacheStale(long accessTime) {
 		if (this.cached == null) {
+			// 第一次启动时候cached 为空
 			return true;
 		}
 		return (accessTime - this.lastAccess) >= this.properties.getTimeToLive();

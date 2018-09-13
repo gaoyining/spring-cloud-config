@@ -70,6 +70,8 @@ import static org.eclipse.jgit.transport.ReceiveCommand.Type.DELETE;
 /**
  * An {@link EnvironmentRepository} backed by a single git repository.
  *
+ * 由单个git存储库支持的{@link EnvironmentRepository}。
+ *
  * @author Dave Syer
  * @author Roy Clarkson
  * @author Marcos Barbero
@@ -87,22 +89,30 @@ public class JGitEnvironmentRepository extends AbstractScmEnvironmentRepository
 	/**
 	 * Timeout (in seconds) for obtaining HTTP or SSH connection (if applicable). Default
 	 * 5 seconds.
+	 *
+	 * 获取HTTP或SSH连接的超时（以秒为单位）（如果适用）。 默认5秒。
 	 */
 	private int timeout;
 
 	/**
 	 * Time (in seconds) between refresh of the git repository
+	 *
+	 * 刷新git存储库之间的时间（以秒为单位）
 	 */
 	private int refreshRate = 0;
 
 	/**
 	 * Time of the last refresh of the git repository
+	 *
+	 * 上次刷新git存储库的时间
 	 */
 	private long lastRefresh;
 
 	/**
 	 * Flag to indicate that the repository should be cloned on startup (not on demand).
 	 * Generally leads to slower startup but faster first query.
+	 *
+	 * 用于指示应在启动时克隆存储库的标志（不是按需）。 通常会导致启动速度变慢但首次查询速度更快
 	 */
 	private boolean cloneOnStart;
 
@@ -113,29 +123,39 @@ public class JGitEnvironmentRepository extends AbstractScmEnvironmentRepository
 	/**
 	 * Factory used to create the credentials provider to use to connect to the Git
 	 * repository.
+	 *
+	 * Factory用于创建用于连接到Git存储库的凭证提供程序。
 	 */
 	private GitCredentialsProviderFactory gitCredentialsProviderFactory = new GitCredentialsProviderFactory();
 
 	/**
 	 * Transport configuration callback for JGit commands.
+	 *
+	 * JGit命令的传输配置回调。
 	 */
 	private TransportConfigCallback transportConfigCallback;
 
 	/**
 	 * Flag to indicate that the repository should force pull. If true discard any local
 	 * changes and take from remote repository.
+	 *
+	 * 用于指示存储库应强制拉出的标记。 如果为true，则丢弃任何本地更改并从远程存储库获取。
 	 */
 	private boolean forcePull;
 	private boolean initialized;
 
 	/**
 	 * Flag to indicate that the branch should be deleted locally if it's origin tracked branch was removed.
+	 *
+	 * 标记表示如果删除了原始跟踪分支，则应在本地删除分支。
 	 */
 	private boolean deleteUntrackedBranches;
 
 	/**
 	 * Flag to indicate that SSL certificate validation should be bypassed when
 	 * communicating with a repository served over an HTTPS connection.
+	 *
+	 * 用于指示在与通过HTTPS连接提供的存储库进行通信时应绕过SSL证书验证的标记。
 	 */
 	private boolean skipSslValidation;
 
@@ -235,6 +255,8 @@ public class JGitEnvironmentRepository extends AbstractScmEnvironmentRepository
 		if (label == null) {
 			label = this.defaultLabel;
 		}
+		// ------------------关键方法-----------------
+		// 准备工作目录 , 获得git，会在这里面做git初始化，checkout，merge，等等
 		String version = refresh(label);
 		return new Locations(application, profile, label, version,
 				getSearchLocations(getWorkingDirectory(), application, profile, label));
@@ -252,20 +274,28 @@ public class JGitEnvironmentRepository extends AbstractScmEnvironmentRepository
 
 	/**
 	 * Get the working directory ready.
+	 *
+	 * 准备工作目录。
 	 */
 	public String refresh(String label) {
 		Git git = null;
 		try {
+			// ------------------关键方法--------------
+			// 创建git客户端
 			git = createGitClient();
+			// ------------------关键方法--------------
+			// 是否需要pull
 			if (shouldPull(git)) {
 				FetchResult fetchStatus = fetch(git, label);
 				if (deleteUntrackedBranches && fetchStatus != null) {
 					deleteUntrackedLocalBranches(fetchStatus.getTrackingRefUpdates(), git);
 				}
 				// checkout after fetch so we can get any new branches, tags, ect.
+				// 获取结账后我们可以获得任何新的分支，标签等。
 				checkout(git, label);
 				if (isBranch(git, label)) {
 					// merge results from fetch
+					// 从fetch合并结果
 					merge(git, label);
 					if (!isClean(git, label)) {
 						logger.warn("The local repository is dirty or ahead of origin. Resetting"
@@ -276,9 +306,11 @@ public class JGitEnvironmentRepository extends AbstractScmEnvironmentRepository
 			}
 			else {
 				// nothing to update so just checkout
+				// 无需更新，只需checkout
 				checkout(git, label);
 			}
 			// always return what is currently HEAD as the version
+			// 始终返回当前HEAD作为版本
 			return git.getRepository().findRef("HEAD").getObjectId().getName();
 		}
 		catch (RefNotFoundException e) {
@@ -392,11 +424,14 @@ public class JGitEnvironmentRepository extends AbstractScmEnvironmentRepository
 		boolean shouldPull;
 
 		if (this.refreshRate > 0 && System.currentTimeMillis() - this.lastRefresh < (this.refreshRate * 1000)) {
+			// 如果当前刷新git时间 > 当前系统时间 - 最后刷新时间 < 当前刷新git时间 * 1000
 			return false;
 		}
 
 		Status gitStatus = git.status().call();
+		// 工作空间clean
 		boolean isWorkingTreeClean = gitStatus.isClean();
+		// 获得originUrl
 		String originUrl = git.getRepository().getConfig().getString("remote", "origin",
 				"url");
 
@@ -508,13 +543,18 @@ public class JGitEnvironmentRepository extends AbstractScmEnvironmentRepository
 			// The only way this can happen is if another JVM (e.g. one that
 			// crashed earlier) created the lock. We can attempt to recover by
 			// wiping the slate clean.
+			// 这种情况发生的唯一方法就是另一个JVM（例如一个JVM）
+			// 早先崩溃了）创建了锁。 我们可以尝试通过恢复
+			// 清除
 			logger.info("Deleting stale JGit lock file at " + lock);
 			lock.delete();
 		}
 		if (new File(getWorkingDirectory(), ".git").exists()) {
+			// 如果 .git文件已经存在，打开git
 			return openGitRepository();
 		}
 		else {
+			// 否则复制资源库
 			return copyRepository();
 		}
 	}
@@ -525,7 +565,9 @@ public class JGitEnvironmentRepository extends AbstractScmEnvironmentRepository
 	// the first
 	// request).
 	private synchronized Git copyRepository() throws IOException, GitAPIException {
+		// 如果文件夹存在则删除
 		deleteBaseDirIfExists();
+		// 创建文件夹
 		getBasedir().mkdirs();
 		Assert.state(getBasedir().exists(), "Could not create basedir: " + getBasedir());
 		if (getUri().startsWith(FILE_URI_PREFIX)) {
@@ -670,6 +712,9 @@ public class JGitEnvironmentRepository extends AbstractScmEnvironmentRepository
 	/**
 	 * Wraps the static method calls to {@link org.eclipse.jgit.api.Git} and
 	 * {@link org.eclipse.jgit.api.CloneCommand} allowing for easier unit testing.
+	 *
+	 * 将静态方法调用包含到{@link org.eclipse.jgit.api.Git}和
+	 * {@link org.eclipse.jgit.api.CloneCommand}允许更容易的单元测试。
 	 */
 	static class JGitFactory {
 

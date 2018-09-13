@@ -48,6 +48,10 @@ import org.springframework.web.util.UrlPathHelper;
  * Then an {@link EnvironmentRepository} is used to supply key-value pairs which are used
  * to replace placeholders in the resource text.
  *
+ * 用于从底层存储库提供模板化纯文本资源的HTTP端点。 可用于提供配置文件以供各种应用程序和服务使用。
+ * {@link ResourceRepository}用于定位特定于应用程序的{@link Resource}，并将内容转换为文本。
+ * 然后使用{@link EnvironmentRepository}提供键值对，用于替换资源文本中的占位符。
+ *
  * @author Dave Syer
  * @author Daniel Lavoie
  *
@@ -105,15 +109,20 @@ public class ResourceController {
 		if (name != null && name.contains("(_)")) {
 			// "(_)" is uncommon in a git repo name, but "/" cannot be matched
 			// by Spring MVC
+            //“（_）”在git repo名称中不常见，但“/”无法匹配
+        	// 由Spring MVC提供
 			name = name.replace("(_)", "/");
 		}
 		if (label != null && label.contains("(_)")) {
 			// "(_)" is uncommon in a git branch name, but "/" cannot be matched
 			// by Spring MVC
+			//“（_）”在git分支名称中不常见，但“/”无法匹配
+			// 由Spring MVC提供
 			label = label.replace("(_)", "/");
 		}
 
 		// ensure InputStream will be closed to prevent file locks on Windows
+		// 确保关闭InputStream以防止Windows上的文件锁定
 		try (InputStream is = this.resourceRepository.findOne(name, profile, label, path)
 				.getInputStream()) {
 			String text = StreamUtils.copyToString(is, Charset.forName("UTF-8"));

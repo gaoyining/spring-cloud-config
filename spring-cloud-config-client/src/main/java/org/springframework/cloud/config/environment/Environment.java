@@ -28,6 +28,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  * DTO for {@link org.springframework.core.env.Environment}, but also applicable outside
  * the domain of a Spring application.
  *
+ * 简单的纯文本可序列化的属性源列表封装。 基本上是{@link org.springframework.core.env.Environment}的DTO，
+ * 但也适用于Spring应用程序的域之外。
+ *
  * @author Dave Syer
  * @author Spencer Gibb
  *

@@ -37,6 +37,8 @@ import org.springframework.validation.annotation.Validated;
 public class MultipleJGitEnvironmentProperties extends JGitEnvironmentProperties {
     /**
      * Map of repository identifier to location and other properties.
+     *
+     * 存储库标识符到位置和其他属性的映射。
      */
     private Map<String, PatternMatchingJGitEnvironmentProperties> repos = new LinkedHashMap<>();
 

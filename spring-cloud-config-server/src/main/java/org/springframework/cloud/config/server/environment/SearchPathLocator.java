@@ -22,6 +22,8 @@ import java.util.Arrays;
  * Strategy for locating a search path for resource (e.g. in the file system or
  * classpath).
  *
+ * 用于定位资源的搜索路径的策略（例如，在文件系统或类路径中）。
+ *
  * @author Dave Syer
  *
  */

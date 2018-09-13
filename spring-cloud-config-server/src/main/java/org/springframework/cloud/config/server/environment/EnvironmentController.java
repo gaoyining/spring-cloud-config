@@ -103,7 +103,8 @@ public class EnvironmentController {
 	@RequestMapping("/{name}/{profiles:.*[^-].*}")
 	public Environment defaultLabel(@PathVariable String name,
 			@PathVariable String profiles) {
-		return labelled(name, profiles, null);
+		Environment environment = labelled(name, profiles, null);
+		return environment;
 	}
 
 	@RequestMapping("/{name}/{profiles}/{label:.*}")
@@ -119,6 +120,8 @@ public class EnvironmentController {
 			// by Spring MVC
 			label = label.replace("(_)", "/");
 		}
+		// --------------------关键方法---------------
+		// 从资源库里面获得指定的资源，如果需要在加密，覆盖
 		Environment environment = this.repository.findOne(name, profiles, label);
 		if(!acceptEmpty && (environment == null || environment.getPropertySources().isEmpty())){
 			 throw new EnvironmentNotFoundException("Profile Not found");

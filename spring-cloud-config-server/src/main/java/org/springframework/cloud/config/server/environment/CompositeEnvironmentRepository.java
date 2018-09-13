@@ -23,6 +23,10 @@ import org.springframework.core.OrderComparator;
 
 /**
  * An {@link EnvironmentRepository} composed of multiple ordered {@link EnvironmentRepository}s.
+ *
+ * {@link EnvironmentRepository}由多个有序{@link EnvironmentRepository}组成。
+ * 组合环境变量仓库
+ *
  * @author Ryan Baxter
  */
 public class CompositeEnvironmentRepository implements EnvironmentRepository {
@@ -34,15 +38,25 @@ public class CompositeEnvironmentRepository implements EnvironmentRepository {
 	 * @param environmentRepositories The list of {@link EnvironmentRepository}s to create the composite from.
 	 */
 	public CompositeEnvironmentRepository(List<EnvironmentRepository> environmentRepositories) {
-		//Sort the environment repositories by the priority
+		// Sort the environment repositories by the priority
+		// 按优先级排序环境存储库
 		Collections.sort(environmentRepositories, OrderComparator.INSTANCE);
 		this.environmentRepositories = environmentRepositories;
 	}
 
+    /**
+     * 通过{@link org.springframework.boot.actuate.health.AbstractHealthIndicator}的doHealthCheck 方法
+     * @param application
+     * @param profile
+     * @param label
+     * @return
+     */
 	@Override
 	public Environment findOne(String application, String profile, String label) {
 		Environment env = new Environment(application, new String[]{profile}, label, null, null);
 		if(environmentRepositories.size() == 1) {
+		    // -------------------关键方法-----------------
+            // 获得一个环境变量的DTO
 			Environment envRepo = environmentRepositories.get(0).findOne(application, profile, label);
 			env.addAll(envRepo.getPropertySources());
 			env.setVersion(envRepo.getVersion());
@@ -52,6 +66,7 @@ public class CompositeEnvironmentRepository implements EnvironmentRepository {
 				env.addAll(repo.findOne(application, profile, label).getPropertySources());
 			}
 		}
+		// 实际对应的环境变量
 		return env;
 	}
 }

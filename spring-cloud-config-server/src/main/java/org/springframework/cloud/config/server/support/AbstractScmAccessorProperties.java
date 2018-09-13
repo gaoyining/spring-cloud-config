@@ -27,37 +27,59 @@ public class AbstractScmAccessorProperties implements EnvironmentRepositoryPrope
 
     /**
      * URI of remote repository.
+     *
+     * 远程存储库的URI。
      */
     private String uri;
     /**
      * Base directory for local working copy of repository.
+     *
+     * 存储库的本地工作副本的基本目录。
      */
     private File basedir;
     /**
      * Search paths to use within local working copy. By default searches only the root.
+     *
+     * 搜索在本地工作副本中使用的路径。 默认情况下，仅搜索根。
      */
     private String[] searchPaths = DEFAULT_LOCATIONS.clone();;
     /**
      * Username for authentication with remote repository.
+     *
+     * 用于远程存储库验证的用户名。
      */
     private String username;
     /**
      * Password for authentication with remote repository.
+     *
+     * 远程存储库验证密码。
      */
     private String password;
     /**
      * Passphrase for unlocking your ssh private key.
+     *
+     * 用于解锁ssh私钥的密码。
      */
     private String passphrase;
     /**
      * Reject incoming SSH host keys from remote servers not in the known host list.
+     *
+     * 从不在已知主机列表中的远程服务器拒绝传入的SSH主机密钥。
      */
     private boolean strictHostKeyChecking = true;
 
-    /** The order of the environment repository. */
+    /**
+     * The order of the environment repository.
+     *
+     * 环境存储库的顺序。
+     */
     private int order = Ordered.LOWEST_PRECEDENCE;
 
-    /** The default label to be used with the remore repository */
+    /**
+     * The default label to be used with the remore repository
+     *
+     * 与远程存储库一起使用的默认标签
+     */
     private String defaultLabel;
 
     public String getUri() {

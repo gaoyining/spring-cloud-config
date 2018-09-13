@@ -27,18 +27,22 @@ public class RetryProperties {
 
 	/**
 	 * Initial retry interval in milliseconds.
+	 * 初始重试间隔（以毫秒为单位）。
 	 */
 	long initialInterval = 1000;
 	/**
 	 * Multiplier for next interval.
+	 * 下一个间隔的乘数。
 	 */
 	double multiplier = 1.1;
 	/**
 	 * Maximum interval for backoff.
+	 * 退避的最大间隔。
 	 */
 	long maxInterval = 2000;
 	/**
 	 * Maximum number of attempts.
+	 * 最大尝试次数。
 	 */
 	int maxAttempts = 6;
 

@@ -77,7 +77,9 @@ public class ConfigServicePropertySourceLocator implements PropertySourceLocator
 	@Retryable(interceptor = "configServerRetryInterceptor")
 	public org.springframework.core.env.PropertySource<?> locate(
 			org.springframework.core.env.Environment environment) {
-		ConfigClientProperties properties = this.defaultProperties.override(environment);
+		// ------------------关键方法----------------------
+        // 对系统资源进行覆盖
+	    ConfigClientProperties properties = this.defaultProperties.override(environment);
 		CompositePropertySource composite = new CompositePropertySource("configService");
 		RestTemplate restTemplate = this.restTemplate == null
 				? getSecureRestTemplate(properties)
@@ -86,13 +88,18 @@ public class ConfigServicePropertySourceLocator implements PropertySourceLocator
 		String errorBody = null;
 		try {
 			String[] labels = new String[] { "" };
+			// 获得所有的profiles
 			if (StringUtils.hasText(properties.getLabel())) {
+			    // 根据，进行分割成数组
 				labels = StringUtils
 						.commaDelimitedListToStringArray(properties.getLabel());
 			}
 			String state = ConfigClientStateHolder.getState();
 			// Try all the labels until one works
+            // 尝试所有标签，直到有效
 			for (String label : labels) {
+			    // -------------------关键方法-------------------
+			    // 从config server获得远程的资源配置
 				Environment result = getRemoteEnvironment(restTemplate, properties,
 						label.trim(), state);
 				if (result != null) {
@@ -206,6 +213,8 @@ public class ConfigServicePropertySourceLocator implements PropertySourceLocator
 
 			try {
 				HttpHeaders headers = new HttpHeaders();
+				// -------------------关键方法---------------
+				// 处理授权
 				addAuthorizationToken(properties, headers, username, password);
 				if (StringUtils.hasText(token)) {
 					headers.add(TOKEN_HEADER, token);

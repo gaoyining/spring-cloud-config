@@ -44,17 +44,23 @@ public class ConfigClientProperties {
 
 	/**
 	 * Flag to say that remote configuration is enabled. Default true;
+	 *
+	 * 标记表示已启用远程配置。 默认为true;
 	 */
 	private boolean enabled = true;
 
 	/**
 	 * The default profile to use when fetching remote configuration (comma-separated).
 	 * Default is "default".
+	 *
+	 * 获取远程配置时使用的默认配置文件（以逗号分隔）。 默认为“默认”。
 	 */
 	private String profile = "default";
 
 	/**
 	 * Name of application used to fetch remote properties.
+	 *
+	 * 用于获取远程属性的应用程序的名称。
 	 */
 	@Value("${spring.application.name:application}")
 	private String name;
@@ -62,51 +68,71 @@ public class ConfigClientProperties {
 	/**
 	 * The label name to use to pull remote configuration properties. The default is set
 	 * on the server (generally "master" for a git based server).
+	 *
+	 * 用于提取远程配置属性的标签名称。 默认值在服务器上设置（对于基于git的服务器通常为“master”）。
 	 */
 	private String label;
 
 	/**
 	 * The username to use (HTTP Basic) when contacting the remote server.
+	 *
+	 * 联系远程服务器时要使用的用户名（HTTP Basic）。
 	 */
 	private String username;
 
 	/**
 	 * The password to use (HTTP Basic) when contacting the remote server.
+	 *
+	 * 联系远程服务器时要使用的密码（HTTP Basic）。
 	 */
 	private String password;
 
 	/**
 	 * The URI of the remote server (default http://localhost:8888).
+	 *
+	 * 远程服务器的URI（默认为http：// localhost：8888）。
 	 */
 	private String[] uri = { "http://localhost:8888" };
 
 	/**
 	 * Discovery properties.
+	 *
+	 * 发现属性。
 	 */
 	private Discovery discovery = new Discovery();
 
 	/**
 	 * Flag to indicate that failure to connect to the server is fatal (default false).
+	 *
+	 * 用于指示无法连接到服务器的标志是致命的（默认为false）。
 	 */
 	private boolean failFast = false;
 
 	/**
 	 * Security Token passed thru to underlying environment repository.
+	 *
+	 * 安全令牌通过底层环境存储库。
 	 */
 	private String token;
 
 	/**
 	 * timeout on waiting to read data from the Config Server.
+	 *
+	 * 等待从Config Server读取数据时超时。
 	 */
 	private int requestReadTimeout = (60 * 1000 * 3) + 5000;
 
 	/**
 	 * Flag to indicate whether to send state. Default true.
+	 *
+	 * 用于指示是否发送状态的标志。 默认为true。
 	 */
 	private boolean sendState = true;
 
 	/**
 	 * Additional headers used to create the client request.
+	 *
+	 * 用于创建客户端请求的其他标头。
 	 */
 	private Map<String, String> headers = new HashMap<>();
 

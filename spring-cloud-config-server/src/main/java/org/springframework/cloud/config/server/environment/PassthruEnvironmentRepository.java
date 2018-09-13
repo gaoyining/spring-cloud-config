@@ -65,6 +65,7 @@ public class PassthruEnvironmentRepository implements EnvironmentRepository {
 		for (org.springframework.core.env.PropertySource<?> source : this.environment
 				.getPropertySources()) {
 			String name = source.getName();
+			// 如果当前环境变量中的在standardSources 中不存在，同事满足为MapPropertySource类型，加入返回结果
 			if (!this.standardSources.contains(name)
 					&& source instanceof MapPropertySource) {
 				result.add(new PropertySource(name, getMap(source)));

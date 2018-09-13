@@ -31,6 +31,9 @@ public class ConfigServerProperties {
 	 * Flag indicating that the config server should initialize its own Environment with
 	 * properties from the remote repository. Off by default because it delays startup but
 	 * can be useful when embedding the server in another application.
+	 *
+	 * 指示配置服务器应使用远程存储库中的属性初始化其自己的Environment的标志。
+	 * 默认情况下关闭，因为它会延迟启动，但在将服务器嵌入另一个应用程序时非常有用。
 	 */
 	private boolean bootstrap;
 

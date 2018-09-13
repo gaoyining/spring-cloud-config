@@ -68,6 +68,7 @@ ApplicationListener<ApplicationEnvironmentPreparedEvent>, Ordered {
 	@Override
 	public void onApplicationEvent(ApplicationEnvironmentPreparedEvent event) {
 		ConfigurableEnvironment environment = event.getEnvironment();
+		// 如果在配置中打开 spring.cloud.config.enabled
 		if (!environment.resolvePlaceholders("${spring.cloud.config.enabled:false}")
 				.equalsIgnoreCase("true")) {
 			if (!environment.getPropertySources().contains(this.propertySource.getName())) {

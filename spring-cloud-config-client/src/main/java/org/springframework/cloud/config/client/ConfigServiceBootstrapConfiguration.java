@@ -50,6 +50,11 @@ public class ConfigServiceBootstrapConfiguration {
 		return client;
 	}
 
+	/**
+	 * 关键bean，从config server获得配置
+	 * @param properties
+	 * @return
+	 */
 	@Bean
 	@ConditionalOnMissingBean(ConfigServicePropertySourceLocator.class)
 	@ConditionalOnProperty(value = "spring.cloud.config.enabled", matchIfMissing = true)

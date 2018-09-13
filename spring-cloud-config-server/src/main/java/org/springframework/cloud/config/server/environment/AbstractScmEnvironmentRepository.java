@@ -44,11 +44,17 @@ public abstract class AbstractScmEnvironmentRepository extends AbstractScmAccess
 	public synchronized Environment findOne(String application, String profile, String label) {
 		NativeEnvironmentRepository delegate = new NativeEnvironmentRepository(getEnvironment(),
 				new NativeEnvironmentProperties());
+		// --------------------关键方法-----------------------
+        // 获得git，会在这里面做git初始化，checkout，merge，等等
 		Locations locations = getLocations(application, profile, label);
 		delegate.setSearchLocations(locations.getLocations());
+		// --------------------关键方法-----------------------
+        // 通过委托获得环境变量
 		Environment result = delegate.findOne(application, profile, "");
 		result.setVersion(locations.getVersion());
 		result.setLabel(label);
+		// --------------------关键方法-----------------------
+		// 对上面的result的数据，进行一些replace， 获得application.yml
 		return this.cleaner.clean(result, getWorkingDirectory().toURI().toString(),
 				getUri());
 	}

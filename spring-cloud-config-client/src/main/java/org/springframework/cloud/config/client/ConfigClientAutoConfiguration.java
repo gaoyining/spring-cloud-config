@@ -33,6 +33,9 @@ import org.springframework.core.env.Environment;
  * but the values in this properties object will be the same as the ones used to bind to
  * the config server, if there is one.
  *
+ * 公开ConfigClientProperties只是为了有办法检查绑定到它的属性。
+ * 它将无法及时自动连接到引导上下文中，但此属性对象中的值将与用于绑定到配置服务器的值相同（如果有）。
+ *
  * @author Dave Syer
  * @author Marcos Barbero
  *
